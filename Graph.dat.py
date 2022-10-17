@@ -7,7 +7,6 @@ def main():
         print("File not exist")
         return
     data = open("Graph.dat", 'rb')
-    #pl = 0
     os.system("mkdir Graph")
     data.seek(20,0)
     filetotal = struct.unpack("<I",data.read(4))[0]
@@ -20,6 +19,13 @@ def main():
         data.seek(flnamestart+namepl,0)
         #filename = getFileName(struct.unpack("s",data.read(35))[0])
         filename = getFileName(b'' + data.read(35))
+        if filename.endswith(".png"):
+            wrfile = open("Graph/"+filename, 'wb')
+            data.seek(fstart)
+            wrfile.write(data.read(flength))
+            wrfile.close()
+            print("complete pic" + str(i))
+            continue
         data.seek(fstart+32,0)
         #filedata = data.read(flength)
         width, height = struct.unpack(">2H",data.read(4))
@@ -38,9 +44,14 @@ def main():
 def getFileName(s):
     p = "{}s".format(len(s))
     s = struct.unpack(p,s)[0]
-    returnstr = str(s,encoding = "sjis")
+    rstr1 = str(s.replace(b"\xFF",b"").replace(b"\x90",b"").replace(b"\x80",b""),encoding = "sjis")
     #returnstr = str(s.replace(b"\x00",b""),encoding = "sjis")
-    return returnstr.rsplit('.', -1)[0]
+    rstr2 = rstr1.rsplit('.', -1)[0]
+    rstr3 = rstr1.rsplit('.', -1)[1]
+    if rstr3.startswith("PNG"):
+        return rstr2+".png"
+    else:
+        return rstr2
 
 if __name__ =="__main__":
     main()
