@@ -18,16 +18,15 @@ def main():
         fstart,dataength,dr0,dr1,namepl = struct.unpack("<5I",data.read(20))
         data.seek(datanamestart+namepl,0)
         filename = getFileName(b'' + data.read(35))
-        if filename.endswith(".png"):
+        if filename.endswith(".PNG"):
             wrfile = open("Graph/"+filename, 'wb')
             data.seek(fstart)
             wrfile.write(data.read(dataength))
             wrfile.close()
             print("complete pic" + str(i))
             continue
-        elif:
+        else:
             filename = filename.rsplit('!', 1)[0]
-        #ex
         data.seek(fstart+8,0)
         filenum = struct.unpack(">I",data.read(4))[0]
         for j in range(filenum):
@@ -42,20 +41,11 @@ def main():
                     color = data.read(4)
                     img.putpixel((x, y), (color[1], color[2], color[3], color[0]))
             if filenum==1:
+                while os.path.exists("Graph/" + filename + ".png"):
+                    filename = filename + "_1"
                 img.save("Graph/" + filename + ".png", 'png')
                 break
             img.save("Graph/" + filename + "_" + str(j) + ".png", 'png')
-        #end ex
-        data.seek(fstart+32,0)
-        width, height = struct.unpack(">2H",data.read(4))
-        img = Image.new('RGBA', (width, height))
-        data.seek(fstart+128,0)
-        for y in range(height):
-            for x in range(width):
-                color = data.read(4)
-                img.putpixel((x, y), (color[1], color[2], color[3], color[0]))
-        img.save("Graph/" + filename + '.png', 'png')
-        #exx
         print("complete pic " + str(i+1))
     data.close()
     print("Complete!")
